@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dekereke PA Export</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3349;
+      --accent: #5b8cff;
+      --accent-hover: #7aa3ff;
+      --accent-dim: rgba(91,140,255,0.12);
+      --text: #e8eaf6;
+      --text-dim: #8892b0;
+      --green: #4caf82;
+      --yellow: #f0b429;
+      --radius: 10px;
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      --mono: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.65;
+      min-height: 100vh;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+    /* ── Layout ── */
+    header {
+      background: linear-gradient(135deg, #0d1424 0%, #131928 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 64px 24px 56px;
+      text-align: center;
+    }
+
+    .container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+
+    main { padding: 56px 0 80px; }
+
+    section { margin-bottom: 56px; }
+
+    /* ── Hero ── */
+    .badge {
+      display: inline-block;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid rgba(91,140,255,0.3);
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      font-size: clamp(1.9rem, 5vw, 3rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    header h1 span { color: var(--accent); }
+
+    header p {
+      font-size: 1.1rem;
+      color: var(--text-dim);
+      max-width: 560px;
+      margin: 0 auto 36px;
+    }
+
+    /* ── Download cards ── */
+    .downloads {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .dl-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+
+    .dl-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .dl-card.recommended {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, var(--surface) 0%, rgba(91,140,255,0.06) 100%);
+    }
+
+    .dl-card .platform-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dl-card.recommended .platform-label { color: var(--accent); }
+
+    .recommended-chip {
+      background: var(--accent-dim);
+      color: var(--accent);
+      border-radius: 100px;
+      font-size: 0.65rem;
+      padding: 2px 8px;
+    }
+
+    .dl-card h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .dl-card .arch {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-bottom: 18px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: background 0.15s, opacity 0.15s;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .btn:hover { background: var(--accent-hover); color: #fff; text-decoration: none; }
+    .btn-outline {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+    .btn-outline:hover { background: var(--accent-dim); color: var(--accent-hover); }
+
+    /* ── Section headings ── */
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── Overview cards ── */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+    }
+
+    .feature-card .icon {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .feature-card h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .feature-card p {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    /* ── Steps ── */
+    .steps { counter-reset: steps; display: flex; flex-direction: column; gap: 16px; }
+
+    .step {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 16px;
+      align-items: start;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .step-num {
+      counter-increment: steps;
+      width: 42px;
+      height: 42px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .step h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
+    .step p { font-size: 0.85rem; color: var(--text-dim); }
+
+    /* ── Code / mapping table ── */
+    .mapping-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      background: var(--surface);
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .mapping-table th {
+      background: var(--surface2);
+      padding: 10px 16px;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .mapping-table td {
+      padding: 9px 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .mapping-table tr:hover td { background: var(--surface2); }
+
+    code {
+      font-family: var(--mono);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 0.85em;
+      color: var(--accent-hover);
+    }
+
+    pre {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      overflow-x: auto;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: var(--text);
+      margin-top: 12px;
+    }
+
+    /* ── Info box ── */
+    .info-box {
+      background: rgba(91,140,255,0.07);
+      border: 1px solid rgba(91,140,255,0.25);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      font-size: 0.88rem;
+      color: var(--text-dim);
+      margin-top: 16px;
+    }
+    .info-box strong { color: var(--text); }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+    }
+
+    footer a { color: var(--text-dim); }
+    footer a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="badge">Linguistic Tooling</div>
+    <h1>Dekereke <span>PA Export</span></h1>
+    <p>Convert Dekereke Phonology Assistant XML databases to Toolbox <code>.db</code> files — no FLEx required.</p>
+
+    <div class="downloads" id="downloads">
+
+      <div class="dl-card" id="card-windows">
+        <div class="platform-label" id="label-windows">
+          Windows
+          <span class="recommended-chip" id="chip-windows" style="display:none">Recommended</span>
+        </div>
+        <h3>Windows Installer</h3>
+        <div class="arch">x64 &nbsp;·&nbsp; Windows 10 / 11</div>
+        <a class="btn" href="https://github.com/rulingAnts/dekereke-PA-export/releases/latest/download/sfm_convert_advanced.exe">
+          &#8595; Download .exe
+        </a>
+      </div>
+
+      <div class="dl-card" id="card-macos">
+        <div class="platform-label" id="label-macos">
+          macOS
+          <span class="recommended-chip" id="chip-macos" style="display:none">Recommended</span>
+        </div>
+        <h3>macOS App Bundle</h3>
+        <div class="arch">Apple Silicon (arm64) &nbsp;·&nbsp; macOS 13+</div>
+        <a class="btn" href="https://github.com/rulingAnts/dekereke-PA-export/releases/latest/download/sfm_convert_advanced-macos-arm64.zip">
+          &#8595; Download .zip
+        </a>
+      </div>
+
+    </div>
+
+    <p style="margin-top:20px; font-size:0.8rem; color:var(--text-dim)">
+      <a href="https://github.com/rulingAnts/dekereke-PA-export/releases">All releases &amp; release notes &#8599;</a>
+    </p>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+
+    <!-- Overview -->
+    <section>
+      <h2>Overview</h2>
+      <p style="color:var(--text-dim); margin-bottom:20px;">
+        Dekereke PA Export bridges the gap between Dekereke Phonology databases and
+        <a href="https://software.sil.org/phonologyassistant/">SIL Phonology Assistant</a>.
+        Rather than going through FLEx (Fieldworks Language Explorer), this tool reads your
+        Dekereke XML export directly and produces a Toolbox <code>.db</code> file that
+        Phonology Assistant can open immediately.
+      </p>
+      <div class="overview-grid">
+        <div class="feature-card">
+          <span class="icon">&#128196;</span>
+          <h4>XML &rarr; Toolbox DB</h4>
+          <p>Reads Dekereke <code>.xml</code> exports and writes standard Toolbox SFM <code>.db</code> files.</p>
+        </div>
+        <div class="feature-card">
+          <span class="icon">&#128640;</span>
+          <h4>No FLEx Needed</h4>
+          <p>Skip the Fieldworks Language Explorer round-trip entirely — open your data in Phonology Assistant directly.</p>
+        </div>
+        <div class="feature-card">
+          <span class="icon">&#9881;</span>
+          <h4>Flexible Mappings</h4>
+          <p>Ships with sensible defaults; supply your own CSV mapping file to match any field layout.</p>
+        </div>
+        <div class="feature-card">
+          <span class="icon">&#128187;</span>
+          <h4>Cross-platform GUI</h4>
+          <p>Native-feeling app bundles for Windows and macOS — no Python installation required.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- How to use -->
+    <section>
+      <h2>How to Use</h2>
+      <div class="steps">
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div>
+            <h4>Export your Dekereke database as XML</h4>
+            <p>From Dekereke, export your phonology database. The root element of the XML file must be <code>&lt;phon_data&gt;</code>, with child <code>&lt;data_form&gt;</code> elements — one per lexical entry.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div>
+            <h4>Launch the app and select your XML file</h4>
+            <p>
+              <strong>Windows:</strong> double-click <code>sfm_convert_advanced.exe</code>.<br>
+              <strong>macOS:</strong> unzip the download, then open <code>sfm_convert_advanced.app</code>.
+              On first launch, right-click &rarr; <em>Open</em> to bypass Gatekeeper if needed.
+            </p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div>
+            <h4>Choose a field mapping</h4>
+            <p>When prompted, click <strong>Yes</strong> to use the built-in default mappings (see table below), or <strong>No</strong> to supply your own CSV mapping file.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">4</div>
+          <div>
+            <h4>Open the output .db file in Phonology Assistant</h4>
+            <p>The tool writes <code>&lt;your-filename&gt;.db</code> alongside the XML file. Add it as a data source in Phonology Assistant — no further conversion needed.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Default field mappings -->
+    <section>
+      <h2>Default Field Mappings</h2>
+      <p style="color:var(--text-dim); margin-bottom:16px;">
+        These mappings are built into the application. The SFM code column is written into the
+        Toolbox <code>.db</code> file; the XML Field Name column is the element name inside
+        each <code>&lt;data_form&gt;</code> block in your Dekereke XML.
+      </p>
+      <table class="mapping-table">
+        <thead>
+          <tr>
+            <th>SFM Code</th>
+            <th>XML Field Name</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><code>\ref</code></td><td>Reference</td><td>Unique record reference / ID</td></tr>
+          <tr><td><code>\ge</code></td><td>Gloss</td><td>English gloss</td></tr>
+          <tr><td><code>\gn</code></td><td>IndonesianGloss</td><td>Indonesian gloss</td></tr>
+          <tr><td><code>\sf</code></td><td>SoundFile</td><td>Linked audio file name</td></tr>
+          <tr><td><code>\ph</code></td><td>Phonetic</td><td>Phonetic transcription</td></tr>
+          <tr><td><code>\ps</code></td><td>Category</td><td>Part of speech / grammatical category</td></tr>
+          <tr><td><code>\var1</code></td><td>Variant1</td><td>First phonological variant</td></tr>
+          <tr><td><code>\var2</code></td><td>Variant2</td><td>Second phonological variant</td></tr>
+          <tr><td><code>\n</code></td><td>Notes</td><td>Free-form notes</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Custom CSV mappings -->
+    <section>
+      <h2>Custom CSV Mappings</h2>
+      <p style="color:var(--text-dim); margin-bottom:12px;">
+        If your Dekereke XML uses different field names, provide a <code>.csv</code> mapping file.
+        Export a spreadsheet from Excel or a text editor in CSV format with these two columns:
+      </p>
+      <table class="mapping-table">
+        <thead>
+          <tr><th>Column A — SFM Code</th><th>Column B — XML Field Name</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>\ref</code></td><td>Reference</td></tr>
+          <tr><td><code>\ge</code></td><td>Gloss</td></tr>
+          <tr><td><em>…additional rows…</em></td><td></td></tr>
+        </tbody>
+      </table>
+      <div class="info-box">
+        <strong>Note:</strong> Row 1 is always treated as a header and skipped. The backslash
+        (<code>\</code>) in SFM codes must be included. Rows with an empty SFM code column are
+        ignored — you can use these to document unmapped fields.
+      </div>
+
+      <p style="color:var(--text-dim); margin-top:20px; margin-bottom:8px;">
+        The output <code>.db</code> file begins with the Toolbox header line and separates
+        records with blank lines:
+      </p>
+      <pre>\_sh v3.0  400  PhoneticData
+
+\ref 001
+\ge dog
+\ph dɔg
+\ps noun
+
+\ref 002
+\ge house
+\ph haʊs
+\ps noun
+</pre>
+    </section>
+
+    <!-- Command-line usage -->
+    <section>
+      <h2>Command-Line Usage</h2>
+      <p style="color:var(--text-dim); margin-bottom:12px;">
+        You can bypass the GUI by passing arguments directly. This is useful for scripting or batch processing.
+      </p>
+      <pre>sfm_convert_advanced.exe &lt;input.xml&gt; &lt;mappings.csv&gt;</pre>
+      <p style="color:var(--text-dim); margin-top:12px;">
+        On macOS, run the app from the command line with:
+      </p>
+      <pre>./sfm_convert_advanced.app/Contents/MacOS/sfm_convert_advanced input.xml mappings.csv</pre>
+      <div class="info-box">
+        When two arguments are provided, the default-mapping prompt is skipped and the supplied
+        CSV is used automatically.
+      </div>
+    </section>
+
+    <!-- Source / License -->
+    <section>
+      <h2>Source &amp; License</h2>
+      <p style="color:var(--text-dim); margin-bottom:16px;">
+        Dekereke PA Export is free and open-source software, released under the
+        <strong>GNU Affero General Public License v3.0 (AGPL-3.0)</strong>.
+        Source code is hosted on GitHub.
+      </p>
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <a class="btn btn-outline" href="https://github.com/rulingAnts/dekereke-PA-export" style="width:auto;">
+          &#128279; View on GitHub
+        </a>
+        <a class="btn btn-outline" href="https://github.com/rulingAnts/dekereke-PA-export/blob/main/LICENSE" style="width:auto;">
+          &#128220; AGPL-3.0 License
+        </a>
+        <a class="btn btn-outline" href="https://github.com/rulingAnts/dekereke-PA-export/issues" style="width:auto;">
+          &#128030; Report an Issue
+        </a>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    Copyright &copy; 2025 Seth Johnston &nbsp;&bull;&nbsp;
+    <a href="https://github.com/rulingAnts/dekereke-PA-export">GitHub</a> &nbsp;&bull;&nbsp;
+    <a href="https://github.com/rulingAnts/dekereke-PA-export/blob/main/LICENSE">AGPL-3.0</a>
+  </div>
+</footer>
+
+<script>
+  // Detect platform and highlight the appropriate download card
+  (function () {
+    var ua = navigator.userAgent || navigator.platform || '';
+    var isWindows = /Win/i.test(ua);
+    var isMac = /Mac/i.test(ua);
+
+    function highlight(cardId, labelId, chipId) {
+      var card = document.getElementById(cardId);
+      var chip = document.getElementById(chipId);
+      if (card) card.classList.add('recommended');
+      if (chip) chip.style.display = 'inline';
+    }
+
+    if (isWindows) {
+      highlight('card-windows', 'label-windows', 'chip-windows');
+    } else if (isMac) {
+      highlight('card-macos', 'label-macos', 'chip-macos');
+    }
+  })();
+</script>
+
+</body>
+</html>
