@@ -36,7 +36,7 @@ For full documentation and a platform-detecting download page, visit the [projec
 
 1. **Export** your Dekereke database as XML. The root element must be `<phon_data>` with child `<data_form>` elements.
 2. **Launch** the application:
-   - **Windows:** double-click `sfm_convert_advanced.exe`
+   - **Windows:** download and double-click `sfm_convert_advanced.exe` — no installation required
    - **macOS:** unzip the download and open `sfm_convert_advanced.app` (right-click → Open on first launch to bypass Gatekeeper)
 3. **Select** your XML file when prompted.
 4. **Choose mappings:** click **Yes** for the built-in defaults, or **No** to supply a custom CSV mapping file.
